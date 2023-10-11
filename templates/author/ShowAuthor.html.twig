@@ -17,3 +17,14 @@
 {% endif %}
 </body>
 </html>
+<tr>{% for author in authors %}</tr>
+                    <tr>
+                        
+                        <td>{{ author.username }}</td>
+                        <td>{{ author.email }}</td>
+                        <td><a href="{{ path('author_edit', {'id': author.id}) }}">EDIT</a>
+                        <a href="{{ path('author_delete' , {'id': author.id}) }}">DELETE</a></td>
+                        
+  
+                    </tr>
+                {% endfor %}

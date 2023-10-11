@@ -64,6 +64,80 @@ public function auhtorDetails ($id)
         'id' => $id
     ]);
 }
+#[Route('/AjoutStatique', name: 'author_ajoutStatique')]
+public function ajoutStatique(EntityManagerInterface $entityManager): Response
+{
+    
+    $author1 = new Author();
+    $author1->setUsername("Molière");
+    $author1->setEmail("Molière@gmail.com"); 
+
+    $entityManager->persist($author1);
+    $entityManager->flush();
+
+    return $this->redirectToRoute('list_author');
+}
+#[Route('/Ajout', name: 'author_ajout')]
+
+public function  Ajout (Request  $request)
+{
+    $author=new Author();
+    $form =$this->CreateForm(AuthorType::class,$author);
+    $form->add('Save',SubmitType::class);
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid())
+    {
+        $em=$this->getDoctrine()->getManager();
+        $em->persist($author);
+        $em->flush();
+        return $this->redirectToRoute('list_author');
+    }
+    return $this->render('author/ajout.html.twig',['form'=>$form->createView()]);
+
+}
+#[Route('/edit/{id}', name: 'author_edit')]
+public function modifier(AuthorRepository $repository, $id, Request $request)
+{
+    $author = $repository->find($id);
+    $form = $this->createForm(AuthorType::class, $author);
+    $form->add('Edit', SubmitType::class);
+
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em = $this->getDoctrine()->getManager();
+        $em->flush(); 
+        return $this->redirectToRoute("list_author");
+    }
+
+    return $this->render('author/modifier.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
+
+#[Route('/delete/{id}', name: 'author_delete')]
+public function deleteAuthor(Request $request, $id, ManagerRegistry $manager): Response
+{
+$em = $manager->getManager();
+$authorRepository = $em->getRepository(Author::class);
+
+$author = $authorRepository->find($id);
+
+
+if ($author !== null) {
+  
+    $em->remove($author);
+    $em->flush();
+
+    $list = $authorRepository->findAll();
+
+    return $this->render('author/listAuthor.html.twig', ['authors' => $list]);
+} else {
+   
+    return new Response('Auteur non trouvé', Response::HTTP_NOT_FOUND);
+}
+}
+
 
 
 
